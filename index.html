@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cotización de viaje en remis con Google Maps</title>
+	<style>
+		#map {
+			height: 500px;
+			width: 100%;
+		}
+	</style>
+	<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCu1KzY1SwIB8NMYBJ08juYnQ1YI-0ujfM&callback=initMap"></script>
+	<script>
+		var map, directionsService, directionsRenderer;
+		function initMap() {
+			directionsService = new google.maps.DirectionsService();
+			directionsRenderer = new google.maps.DirectionsRenderer();
+			map = new google.maps.Map(document.getElementById("map"), {
+				center: { lat: -34.603722, lng: -58.381592 },
+				zoom: 13
+			});
+			directionsRenderer.setMap(map);
+		}
+
+		window.onload = initMap;
+	</script>
+</head>
+<body>
+	<label for="origen">Origen:</label>
+	<input type="text" id="origen" placeholder="Ingrese el origen">
+	<label for="destino">Destino:</label>
+	<input type="text" id="destino" placeholder="Ingrese el destino">
+	<button id="cotizar">Cotizar</button>
+	<h2 id="resultado"></h2>
+	<div id="map"></div>
+
+	<script>
+		var origenInput = document.querySelector("#origen");
+		var destinoInput = document.querySelector("#destino");
+		var cotizarButton = document.querySelector("#cotizar");
+		var resultado = document.querySelector("#resultado");
+
+		cotizarButton.addEventListener("click", function() {
+			var origen = origenInput.value;
+			var destino = destinoInput.value;
+			var request = {
+				origin: origen,
+				destination: destino,
+				travelMode: google.maps.TravelMode.DRIVING
+			};
+			directionsService.route(request, function(response, status) {
+				if (status == google.maps.DirectionsStatus.OK) {
+					directionsRenderer.setDirections(response);
+					var distancia = response.routes[0].legs[0].distance.value;
+					var costo = 50 + distancia / 1000 * 15;
+					resultado.textContent = "El costo del viaje es $" + costo.toFixed(2);
+				} else {
+					alert("No se pudo calcular la ruta.");
+				}
+			});
+		});
+	</script>
+</body>
+</html>
